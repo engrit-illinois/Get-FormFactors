@@ -145,8 +145,6 @@ function Get-FormFactors {
 			log "Trying CIM..." -l 3 -v 1
 			try {
 				$info = Get-CIMInstance -ComputerName $compName -Class $cimClass -ErrorAction $cimErrorAction -OperationTimeoutSec $CIMTimeoutSec
-				$make = $info.Manufacturer
-				$model = $info.Model
 			}
 			catch {
 				log "CIM didn't work." -l 3 -v 1
@@ -161,8 +159,6 @@ function Get-FormFactors {
 					# In some cases (Win7 + PSv2), CIM and remote WMI were not working, but this did for some reason
 					
 					$info = Invoke-Command -ComputerName $compName -ErrorAction $cimErrorAction -ScriptBlock { Get-WMIObject -Class $cimClass -ErrorAction $cimErrorAction }
-					$make = $info.Manufacturer
-					$model = $info.Model
 				}
 				catch {
 					log "Invoke-Command didn't work." -l 3 -v 1
@@ -176,8 +172,6 @@ function Get-FormFactors {
 				try {
 					# Fall back to WMI
 					$info = Get-WMIObject -ComputerName $compName -Class $cimClass -ErrorAction $cimErrorAction
-					$make = $info.Manufacturer
-					$model = $info.Model
 				}
 				catch {
 					log "WMI didn't work. I give up." -l 3 -v 1
@@ -185,8 +179,11 @@ function Get-FormFactors {
 				}
 			}
 			
-			$comp.Make = $make
-			$comp.Model = $model
+			$comp.Manufacturer = $info.Manufacturer
+			$comp.Model = $info.Model
+			$comp.ChassisTypes = $info.ChassisTypes
+			$comp.SerialNumber = $info.SerialNumber
+			$comp.SMBIOSAssetTag = $info.SMBIOSAssetTag
 			
 			if($info) {
 				log "Model is `"$make $model`"." -l 3
@@ -218,8 +215,6 @@ function Get-FormFactors {
 			log "Trying CIM..." -l 3 -v 1
 			try {
 				$info = Get-CIMInstance -ComputerName $compName -Class $cimClass -ErrorAction $cimErrorAction -OperationTimeoutSec $CIMTimeoutSec
-				$make = $info.Manufacturer
-				$model = $info.Model
 			}
 			catch {
 				log "CIM didn't work." -l 3 -v 1
@@ -234,8 +229,6 @@ function Get-FormFactors {
 					# In some cases (Win7 + PSv2), CIM and remote WMI were not working, but this did for some reason
 					
 					$info = Invoke-Command -ComputerName $compName -ErrorAction $cimErrorAction -ScriptBlock { Get-WMIObject -Class $cimClass -ErrorAction $cimErrorAction }
-					$make = $info.Manufacturer
-					$model = $info.Model
 				}
 				catch {
 					log "Invoke-Command didn't work." -l 3 -v 1
@@ -249,8 +242,6 @@ function Get-FormFactors {
 				try {
 					# Fall back to WMI
 					$info = Get-WMIObject -ComputerName $compName -Class $cimClass -ErrorAction $cimErrorAction
-					$make = $info.Manufacturer
-					$model = $info.Model
 				}
 				catch {
 					log "WMI didn't work. I give up." -l 3 -v 1
@@ -258,8 +249,13 @@ function Get-FormFactors {
 				}
 			}
 			
-			$comp.Make = $make
-			$comp.Model = $model
+			$comp.Manufacturer = $info.Manufacturer
+			$comp.Model = $info.Model
+			$comp.ChassisSKUNumber = $info.ChassisSKUNumber
+			$comp.SystemFamily = $info.SystemFamily
+			$comp.SystemSKUNumber = $info.SystemSKUNumber
+			$comp.SystemType = $info.SystemType
+			$comp.TotalPhysicalMemory = $info.TotalPhysicalMemory
 			
 			if($info) {
 				log "Model is `"$make $model`"." -l 3
@@ -275,7 +271,15 @@ function Get-FormFactors {
 		
 		$comp
 	}
-
+	
+	function Export-Comps($comps) {
+		log "Exporting data to `"$CSVPATH`"..." -l 2
+		$comps = $comps | Sort Name
+		#$comps = $comps | Select 
+		$comps | Export-Csv -Encoding Ascii -NoTypeInformation -Path $CSVPATH
+		log "Done exporting assignments." -l 2 -v 2
+	}
+	
 	function Do-Stuff {
 		log " " -nots
 		
@@ -290,7 +294,5 @@ function Get-FormFactors {
 	
 	log "EOF"
 	log " " -nots
-	
-	log "test"
 
 }
