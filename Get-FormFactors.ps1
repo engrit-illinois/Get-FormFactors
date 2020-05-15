@@ -290,5 +290,7 @@ function Get-FormFactors {
 	
 	log "EOF"
 	log " " -nots
+	
+	log "test"
 
 }
