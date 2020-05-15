@@ -144,7 +144,80 @@ function Get-FormFactors {
 			
 			# If CIM doesn't work
 			if((!$info) -and (!$DisableCIMFallbacks)) {
-				log "Trying Invoke-Command to grab model via WMI locally..." -l 3 -v 1
+				log "Trying Invoke-Command to use WMI locally..." -l 3 -v 1
+				try {
+					# Try Invoke-Command
+					# In some cases (Win7 + PSv2), CIM and remote WMI were not working, but this did for some reason
+					
+					$info = Invoke-Command -ComputerName $compName -ErrorAction $cimErrorAction -ScriptBlock { Get-WMIObject -Class $cimClass -ErrorAction $cimErrorAction }
+					$make = $info.Manufacturer
+					$model = $info.Model
+				}
+				catch {
+					log "Invoke-Command didn't work." -l 3 -v 1
+					Log-Error $_ -v 2
+				}
+			}
+				
+			# If Invoke-Command doesn't work
+			if((!$info) -and (!$DisableCIMFallbacks)) {
+				log "Trying WMI..." -l 3 -v 1
+				try {
+					# Fall back to WMI
+					$info = Get-WMIObject -ComputerName $compName -Class $cimClass -ErrorAction $cimErrorAction
+					$make = $info.Manufacturer
+					$model = $info.Model
+				}
+				catch {
+					log "WMI didn't work. I give up." -l 3 -v 1
+					Log-Error $_ -v 2
+				}
+			}
+			
+			$comp.Make = $make
+			$comp.Model = $model
+			
+			if($info) {
+				log "Model is `"$make $model`"." -l 3
+			}
+			else {
+				log "Model not retrieved from computer: `"$compName`"!" -l 3
+			}
+		}
+		else {
+			log "Computer `"$compName`" did not respond!" -l 3
+		}
+		log "Done getting Model for computer: `"$compName`"..." -l 2 -v 2
+		
+		$comp
+	}
+	
+	function Get-ChassisType($comp) {
+		$compName = $comp.name
+		log " " -nots -v 1
+		log "Getting chassis type data for computer: `"$compName`"..." -l 2
+		
+		if(Test-Connection $compName -Quiet -Count 1) {
+			log "Computer `"$compName`" responded." -l 3 -v 2
+			
+			$cimClass = "Win32_ComputerSystem"
+			$cimErrorAction = "Stop"
+			
+			# Try CIM first as it's the easiest
+			log "Trying CIM..." -l 3 -v 1
+			try {
+				$info = Get-CIMInstance -ComputerName $compName -Class $cimClass -ErrorAction $cimErrorAction -OperationTimeoutSec $CIMTimeoutSec
+				$make = $info.Manufacturer
+				$model = $info.Model
+			}
+			catch {
+				log "CIM didn't work." -l 3 -v 1
+				Log-Error $_ -v 2
+			}
+			
+			# If CIM doesn't work
+			if((!$info) -and (!$DisableCIMFallbacks)) {
+				log "Trying Invoke-Command to use WMI locally..." -l 3 -v 1
 				try {
 					# Try Invoke-Command
 					# In some cases (Win7 + PSv2), CIM and remote WMI were not working, but this did for some reason
