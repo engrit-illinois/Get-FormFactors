@@ -17,7 +17,7 @@ function Get-FormFactors {
 	
 	# https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-systemenclosure#members
 	$CHASSIS_TYPES = @(
-		[PSCustomObject]@{"Id" = 1; "Name" = "Other" },
+		[PSCustomObject]@{"Id" = 1; "Name" = "Other"},
 		[PSCustomObject]@{"Id" = 2; "Name" = "Unknown"},
 		[PSCustomObject]@{"Id" = 3; "Name" = "Desktop"},
 		[PSCustomObject]@{"Id" = 4; "Name" = "Low Profile Desktop"},
@@ -127,6 +127,8 @@ function Get-FormFactors {
 		foreach($thisComp in $comps) {
 			$thisComp = [PSCustomObject]@{
 				"Name" = $thisComp
+				"Error" = $false
+				"ErrorMsg" = $null
 				"CS_Manufacturer" = $null
 				"CS_Model" = $null
 				"CS_ChassisSKUNumber" = $null
@@ -159,9 +161,18 @@ function Get-FormFactors {
 			log "Getting data for computer $num/$count ($completion%): `"$thisCompName`"..." -l 1
 			$num += 1
 			
-			$comp = Get-ComputerSystem $comp
-			$comp = Get-SystemEnclosure $comp
-						
+			if(Test-Connection -ComputerName $thisCompName -Count 1 -Quiet) {
+				$comp = Get-ComputerSystem $comp
+				if(!$comp.Error) {
+					$comp = Get-SystemEnclosure $comp
+				}
+			}
+			else {
+				log "Computer did not respond to ping!" -l 2
+				$comp.Error = $true
+				$comp.ErrorMsg = "No pong"
+			}
+			
 			log " " -nots -v 1
 			log "Done getting data for computer: `"$thisCompName`"." -l 1
 			
@@ -236,6 +247,8 @@ function Get-FormFactors {
 			}
 			else {
 				log "Data not retrieved from computer: `"$compName`"!" -l 3
+				$comp.Error = $true
+				$comp.ErrorMsg = "Could not retrieve Win32_ComputerSystem data"
 			}
 		}
 		else {
@@ -332,11 +345,11 @@ function Get-FormFactors {
 	}
 	
 	function Export-Comps($comps) {
-		log "Exporting data to `"$CSV_PATH`"..." -l 2
+		log "Exporting data to `"$CSV_PATH`"..."
 		$comps = $comps | Sort Name
 		#$comps = $comps | Select 
 		$comps | Export-Csv -Encoding Ascii -NoTypeInformation -Path $CSV_PATH
-		log "Done exporting assignments." -l 2 -v 2
+		log "Done exporting assignments." -v 2
 	}
 	
 	function Do-Stuff {
