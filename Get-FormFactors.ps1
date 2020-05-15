@@ -83,8 +83,19 @@ function Get-FormFactors {
 		foreach($thisComp in $comps) {
 			$thisCompHash = @{
 				"Name" = $thisComp
-				"Model" = $null
-				"ChassisType" = $null
+				"CS_Manufacturer" = $null
+				"CS_Model" = $null
+				"CS_ChassisSKUNumber" = $null
+				"CS_SystemFamily" = $null
+				"CS_SystemSKUNumber" = $null
+				"CS_SystemType" = $null
+				"CS_TotalPhysicalMemory" = $null
+				"SE_Manufacturer" = $null
+				"SE_Model" = $null
+				"SE_ChassisTypes" = $null
+				"SE_SerialNumber" = $null
+				"SE_SMBIOSAssetTag" = $null
+				
 			}
 			$thisCompObject = New-Object PSObject -Property $thisCompHash
 			$compObjects += @($thisCompObject)
@@ -200,7 +211,7 @@ function Get-FormFactors {
 		if(Test-Connection $compName -Quiet -Count 1) {
 			log "Computer `"$compName`" responded." -l 3 -v 2
 			
-			$cimClass = "Win32_ComputerSystem"
+			$cimClass = "Win32_SystemEnclosure"
 			$cimErrorAction = "Stop"
 			
 			# Try CIM first as it's the easiest
