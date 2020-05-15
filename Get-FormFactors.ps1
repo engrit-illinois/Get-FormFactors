@@ -116,7 +116,8 @@ function Get-FormFactors {
 			log "Getting data for computer $num/$count ($completion%): `"$thisCompName`"..." -l 1
 			$num += 1
 			
-			$comp = Get-Model $comp
+			$comp = Get-ComputerSystem $comp
+			$comp = Get-SystemEnclosure $comp
 						
 			log " " -nots -v 1
 			log "Done getting data for computer: `"$thisCompName`"." -l 1
@@ -130,7 +131,7 @@ function Get-FormFactors {
 		$comps
 	}
 	
-	function Get-Model($comp) {
+	function Get-ComputerSystem($comp) {
 		$compName = $comp.name
 		log " " -nots -v 1
 		log "Getting model data for computer: `"$compName`"..." -l 2
@@ -179,31 +180,33 @@ function Get-FormFactors {
 				}
 			}
 			
-			$comp.Manufacturer = $info.Manufacturer
-			$comp.Model = $info.Model
-			$comp.ChassisTypes = $info.ChassisTypes
-			$comp.SerialNumber = $info.SerialNumber
-			$comp.SMBIOSAssetTag = $info.SMBIOSAssetTag
+			$comp.CS_Manufacturer = $info.Manufacturer
+			$comp.CS_Model = $info.Model
+			$comp.CS_ChassisSKUNumber = $info.ChassisSKUNumber
+			$comp.CS_SystemFamily = $info.SystemFamily
+			$comp.CS_SystemSKUNumber = $info.SystemSKUNumber
+			$comp.CS_SystemType = $info.SystemType
+			$comp.CS_TotalPhysicalMemory = $info.TotalPhysicalMemory
 			
 			if($info) {
-				log "Model is `"$make $model`"." -l 3
+				log "Model is `"$($comp.CS_Manufacturer)`" `"$($comp.CS_Model)`"." -l 3
 			}
 			else {
-				log "Model not retrieved from computer: `"$compName`"!" -l 3
+				log "Data not retrieved from computer: `"$compName`"!" -l 3
 			}
 		}
 		else {
 			log "Computer `"$compName`" did not respond!" -l 3
 		}
-		log "Done getting Model for computer: `"$compName`"..." -l 2 -v 2
+		log "Done getting model for computer: `"$compName`"..." -l 2 -v 2
 		
 		$comp
 	}
 	
-	function Get-ChassisType($comp) {
+	function Get-SystemEnclosure($comp) {
 		$compName = $comp.name
 		log " " -nots -v 1
-		log "Getting chassis type data for computer: `"$compName`"..." -l 2
+		log "Getting Win32_SystemEnclosure data for computer: `"$compName`"..." -l 2
 		
 		if(Test-Connection $compName -Quiet -Count 1) {
 			log "Computer `"$compName`" responded." -l 3 -v 2
@@ -249,25 +252,23 @@ function Get-FormFactors {
 				}
 			}
 			
-			$comp.Manufacturer = $info.Manufacturer
-			$comp.Model = $info.Model
-			$comp.ChassisSKUNumber = $info.ChassisSKUNumber
-			$comp.SystemFamily = $info.SystemFamily
-			$comp.SystemSKUNumber = $info.SystemSKUNumber
-			$comp.SystemType = $info.SystemType
-			$comp.TotalPhysicalMemory = $info.TotalPhysicalMemory
+			$comp.SE_Manufacturer = $info.Manufacturer
+			$comp.SE_Model = $info.Model
+			$comp.SE_ChassisTypes = $info.ChassisTypes
+			$comp.SE_SerialNumber = $info.SerialNumber
+			$comp.SE_SMBIOSAssetTag = $info.SMBIOSAssetTag
 			
 			if($info) {
-				log "Model is `"$make $model`"." -l 3
+				log "Model is `"$($comp.SE_Manufacturer)`" `"$($comp.SE_Model)`". ChassisTypes is `"$($comp.SE_ChassisTypes)`"." -l 3
 			}
 			else {
-				log "Model not retrieved from computer: `"$compName`"!" -l 3
+				log "Data not retrieved from computer: `"$compName`"!" -l 3
 			}
 		}
 		else {
 			log "Computer `"$compName`" did not respond!" -l 3
 		}
-		log "Done getting Model for computer: `"$compName`"..." -l 2 -v 2
+		log "Done getting Win32_SystemEnclosure data for computer: `"$compName`"..." -l 2 -v 2
 		
 		$comp
 	}
