@@ -330,7 +330,7 @@ function Get-FormFactors {
 					$comp.SE_ChassisTypes = $chassisTypesString
 				}
 				
-				log "Model is `"$($comp.SE_Manufacturer)`" `"$($comp.SE_Model)`". ChassisTypes is `"$($comp.SE_ChassisTypes)`" (`"$($comp.SE_ChassisTypesFriendlyName)`")." -l 3
+				log "Model is `"$($comp.SE_Manufacturer)`" `"$($comp.SE_Model)`". ChassisTypes is `"$($comp.SE_ChassisTypes)`" (`"$($comp.SE_ChassisTypesFriendly)`")." -l 3
 			}
 			else {
 				log "Data not retrieved from computer: `"$compName`"!" -l 3
