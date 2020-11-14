@@ -2,8 +2,8 @@
 Takes an AD OU. Queries all computers in that OU for their make, model, and other chassis-related info, and outputs the results in a CSV.
 
 # Instructions
-1. Download `Get-FormFactors.ps1`
-2. Import it as a module: `Import-Module "c:\path\to\script\Get-FormFactors.ps1"`
+1. Download `Get-FormFactors.psm1`
+2. Import it as a module: `Import-Module "c:\path\to\script\Get-FormFactors.psm1"`
 3. Run it: `Get-FormFactors -OUDN "OU=YourOU,OU=Desktops,OU=Engineering,OU=Urbana,DC=ad,DC=uillinois,DC=edu"`
 
 # Parameters
