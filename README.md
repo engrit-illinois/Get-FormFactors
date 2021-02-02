@@ -29,4 +29,4 @@ By default, if a CIM query fails, the script will fall back on alternate query m
 When this switch is specified, and the initial CIM query fails (after the timeout specified by `CIMTimeoutSec`), the script will skip the fallback methods and move onto the next computer.  
 
 # Notes
-- By mseng3
+- By mseng3. See my other projects here: https://github.com/mmseng/code-compendium.
