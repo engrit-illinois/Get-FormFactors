@@ -2,7 +2,7 @@
 Takes an AD OU. Queries all computers in that OU for their make, model, and other chassis-related info, and outputs the results in a CSV.
 
 # Instructions
-1. Download `Get-FormFactors.psm1` to `$HOME\Documents\WindowsPowerShell\Modules\Get-FormFactors\Get-FormFactors.psm1`.
+1. Download `Get-FormFactors.psm1` to the appropriate subdirectory of your PowerShell [modules directory](https://github.com/engrit-illinois/how-to-install-a-custom-powershell-module).
 2. Run it: `Get-FormFactors -OUDN "OU=YourOU,OU=Desktops,OU=Engineering,OU=Urbana,DC=ad,DC=uillinois,DC=edu"`
 
 # Parameters
